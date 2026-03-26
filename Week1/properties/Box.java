@@ -1,4 +1,4 @@
- public class A {
+ class A {
     int a;
 }
 class B{
@@ -10,7 +10,8 @@ int c;
 public class Box{
 String d;
 
-}
+
 public static void main (String []args){
 
+}
 }

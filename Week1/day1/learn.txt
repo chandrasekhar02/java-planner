@@ -1,0 +1,303 @@
+# OOP Concepts in Java
+
+## 1. Introduction to OOP
+Object-Oriented Programming (OOP) is a programming paradigm based on objects, which contain data (attributes) and code (methods). Java is fully object-oriented. The four main pillars are:
+- **Encapsulation**: Bundling data and methods, hiding internals (using private fields, getters/setters).
+- **Inheritance**: Reusing code from parent classes.
+- **Polymorphism**: Objects of different classes treated as same type (overloading/overriding).
+- **Abstraction**: Hiding complexity, showing essentials (abstract classes/interfaces).
+
+## 2. Access Modifiers
+Control access to classes, methods, fields. Four levels:
+- **public**: Accessible everywhere.
+- **protected**: Same package + subclasses.
+- **default (no modifier)**: Same package only.
+- **private**: Same class only.
+
+```java
+public class Example {
+    private int secret;      // Only within Example
+    protected int data;      // Package + subclasses
+    int pkgDefault;          // Same package
+    public void show() {}    // Everywhere
+}
+```
+
+## 3. Encapsulation (In Depth)
+Encapsulation binds data and methods, restricts direct access to hide internals (data hiding). Achieved via:
+- Private fields.
+- Public getters/setters for controlled access.
+- Benefits: Security, flexibility, maintainability.
+
+```java
+public class BankAccount {
+    private double balance;  // Private data
+    
+    // Getter
+    public double getBalance() {
+        return balance;
+    }
+    
+    // Setter with validation
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+        } else {
+            System.out.println("Invalid amount");
+        }
+    }
+    
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+        }
+    }
+}
+
+// Usage
+BankAccount acc = new BankAccount();
+acc.deposit(1000);
+System.out.println(acc.getBalance());  // 1000.0
+// acc.balance = -500;  // Compile error!
+```
+
+## 4. What is a Class?
+A class is a blueprint or template for creating objects. It defines attributes (fields) and behaviors (methods).
+
+```java
+class Car {
+    String brand;  // Field
+    int speed;
+    
+    void drive() {  // Method
+        System.out.println("Driving " + brand);
+    }
+}
+```
+
+Objects are instances: `Car myCar = new Car();`
+
+## 5. Constructor
+A special method called when object is created (`new`). Same name as class, no return type.
+- **Default Constructor**: No params, provided if none defined.
+- **Parameterized Constructor**: Takes args to initialize fields.
+
+```java
+class Car {
+    String brand;
+    
+    // Default constructor
+    Car() {
+        brand = "Unknown";
+    }
+    
+    // Parameterized
+    Car(String b) {
+        brand = b;
+    }
+}
+```
+
+## 6. Static vs Non-Static
+- **Static**: Belongs to class, shared by all instances. Use `static` keyword. Called without object (e.g., `Class.method()`). For constants, utilities.
+- **Non-Static (Instance)**: Belongs to object. Needs instance to access.
+
+```java
+class MathUtil {
+    static int count = 0;  // Static field
+    
+    static void increment() {  // Static method
+        count++;
+    }
+    
+    int instanceVar;  // Non-static
+}
+```
+
+`MathUtil.increment();` // OK, no object needed.
+
+## 7. Inheritance
+Mechanism where child class (subclass) inherits fields/methods from parent (superclass) using `extends`. Promotes code reuse.
+
+**Types of Inheritance in Java:**
+- **Single**: One parent. `class Dog extends Animal {}`
+- **Multilevel**: Chain. `class Puppy extends Dog {}`
+- **Hierarchical**: Multiple children, one parent. `Cat` and `Dog` both extend `Animal`.
+- **Multiple**: Not direct (diamond problem), achieved via interfaces.
+- **Hybrid**: Mix (e.g., hierarchical + multilevel).
+
+```java
+class Animal {
+    void eat() { System.out.println("Eating"); }
+}
+class Dog extends Animal {
+    void bark() { System.out.println("Bark"); }
+}
+```
+
+## 8. Polymorphism
+"One interface, multiple forms."
+- **Compile-time (Static)**: Method Overloading.
+- **Runtime (Dynamic)**: Method Overriding.
+
+## 9. Abstraction
+Hiding implementation details, showing only essentials.
+
+- **Abstract Class**: `abstract class`, can't instantiate, may have abstract methods (no body).
+- **Interface**: `interface`, 100% abstract (pre-Java 8), supports multiple inheritance.
+
+**Differences:**
+| Feature | Abstract Class | Interface |
+|---------|----------------|-----------|
+| Methods | Abstract + concrete | Abstract (default), static/default (Java 8+) |
+| Variables | Any | Public static final |
+| Inheritance | Single (`extends`) | Multiple (`implements`) |
+| Constructor | Yes | No |
+| Access Modifiers | Any | Public |
+| Purpose | Partial abstraction | Full abstraction/contracts |
+
+```java
+// Abstract class
+abstract class Shape {
+    abstract void draw();  // Abstract method
+    void info() { System.out.println("Shape info"); }  // Concrete
+}
+
+// Interface
+interface Drawable {
+    void draw();  // Public abstract by default
+}
+```
+
+## 10. Method Overloading (Compile-time Polymorphism)
+Multiple methods same name, different params (number/type/order) in same class.
+
+```java
+class Calculator {
+    int add(int a, int b) { return a + b; }
+    double add(double a, double b) { return a + b; }
+    int add(int a, int b, int c) { return a + b + c; }
+}
+```
+
+## 11. Method Overriding (Runtime Polymorphism)
+Subclass provides specific implementation of superclass method. Same signature.
+
+```java
+class Animal {
+    void sound() { System.out.println("Some sound"); }
+}
+class Dog extends Animal {
+    @Override
+    void sound() { System.out.println(\"Bark\"); }
+}
+```
+
+Use `@Override` annotation for safety.
+
+## 12. SOLID Principles
+SOLID are five design principles for maintainable, scalable OOP code. Here are examples:
+
+- **S**ingle Responsibility Principle (SRP): A class should have **one reason to change** (one job).
+  ```java
+  // BAD: Multi-responsibility
+  class Employee {
+      void calculateSalary() { /* ... */ }
+      void saveToDatabase() { /* ... */ }  // Wrong responsibility
+      void printReport() { /* ... */ }
+  }
+  
+  // GOOD: Separate classes
+  class Employee {
+      void calculateSalary() { /* ... */ }
+  }
+  class EmployeeRepository {
+      void saveToDatabase(Employee e) { /* ... */ }
+  }
+  class EmployeeReportPrinter {
+      void printReport(Employee e) { /* ... */ }
+  }
+  ```
+
+- **O**pen/Closed Principle (OCP): Open for **extension**, closed for **modification**.
+  ```java
+  // BAD: Modify existing class for new shapes
+  class AreaCalculator {
+      double area(Object shape) {
+          if (shape instanceof Circle) { /* calc */ }
+          else if (shape instanceof Square) { /* calc */ }
+          // New Rectangle? Modify class!
+      }
+  }
+  
+  // GOOD: Extend via polymorphism
+  abstract class Shape {
+      abstract double area();
+  }
+  class Circle extends Shape {
+      double area() { /* pi r^2 */ }
+  }
+  class Rectangle extends Shape {
+      double area() { /* l * w */ }
+  }
+  class AreaCalculator {
+      double totalArea(List<Shape> shapes) {
+          return shapes.stream().mapToDouble(Shape::area).sum();
+      }
+  }
+  ```
+
+- **L**iskov Substitution Principle (LSP): Subclasses must be substitutable for base without altering correctness.
+  ```java
+  // BAD: Bird base, but Ostrich can't fly
+  class Bird { void fly() { /* ... */ } }
+  class Ostrich extends Bird { void fly() { throw new Exception("Can't fly"); } }
+  
+  // GOOD: Separate flying behavior
+  interface Flyable { void fly(); }
+  class Sparrow implements Flyable { public void fly() { /* ... */ } }
+  class Ostrich { /* no fly */ }
+  ```
+
+- **I**nterface Segregation Principle (ISP): Prefer many small, specific interfaces over one general-purpose.
+  ```java
+  // BAD: Fat interface
+  interface Worker {
+      void work();
+      void eat();
+  }
+  class Robot implements Worker { /* can't eat! Forced empty impl */ }
+  
+  // GOOD: Segregated
+  interface Workable { void work(); }
+  interface Eatable { void eat(); }
+  class Human implements Workable, Eatable { /* impl both */ }
+  class Robot implements Workable { /* only work */ }
+  ```
+
+- **D**ependency Inversion Principle (DIP): Depend on abstractions, not concretions. High-level modules shouldn't depend on low-level.
+  ```java
+  // BAD: Direct concrete dependency
+  class KeyboardLogger {
+      void log(String msg) { /* file log */ }
+  }
+  class Keyboard {
+      KeyboardLogger logger = new KeyboardLogger();  // Tight coupling
+  }
+  
+  // GOOD: Abstraction
+  interface Logger {
+      void log(String msg);
+  }
+  class FileLogger implements Logger { /* ... */ }
+  class ConsoleLogger implements Logger { /* ... */ }
+  class Keyboard {
+      private Logger logger;
+      Keyboard(Logger logger) { this.logger = logger; }  // Inject dependency
+  }
+  // Usage: new Keyboard(new ConsoleLogger());
+  ```
+
+These principles reduce coupling, improve flexibility, and make code easier to maintain.
+
+These concepts form the foundation of Java OOP. Practice with examples!
