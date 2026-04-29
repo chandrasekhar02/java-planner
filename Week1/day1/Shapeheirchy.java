@@ -42,9 +42,9 @@ class Rectangle implements Shape {
     private double a, b, c;
 
     Triangle(double a, double b, double c) {
-        this.a = a;
-        this.b = b;
-        this.c = c;
+        this.a = 1;
+        this.b = 2;
+        this.c = 3;
     }
 
     @Override

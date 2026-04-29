@@ -1,10 +1,15 @@
 public class MainShape {
     public static void main (String []args){
         MultipleShapes Shape= new MultipleShapes();
-        Cirlce circle = new Cirlce();
-        Sqaure sqaure= new Sqaure();
+        MultipleShapes circle = new Cirlce();
+        MultipleShapes sqaure= new Sqaure();
+        Triangl triangle = new Triangl();
+        
 
         Shape.area();
         sqaure.area();
+        circle.area();
+        triangle.area();
+
     }
 }

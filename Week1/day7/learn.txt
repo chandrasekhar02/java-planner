@@ -1,0 +1,253 @@
+Java Week 1 Day 7: Advanced Java Features and Mini-Project
+=========================================================
+
+This document covers the key concepts learned in Day 7 of the Java learning plan:
+- Records (introduced in Java 16)
+- Sealed Classes (introduced in Java 17)
+- Text Blocks and Multiline Strings (Java 13, enhanced in later versions)
+- CompletableFuture Basics (supplyAsync, thenApply)
+- Mini-Project: Student Grade Report Generator
+
+Each concept is explained in depth with examples and use cases.
+
+1. Records (Java 16)
+
+
+Records are a new kind of class in Java designed to be simple data carriers. They automatically generate boilerplate code like constructors, getters, equals(), hashCode(), and toString() methods.
+
+Key Characteristics:
+- Immutable by default (all fields are final)
+- Automatically generate accessor methods (fieldName() instead of getFieldName())
+- Compact syntax for defining data classes
+- Cannot extend other classes (but can implement interfaces)
+- Can have additional methods and constructors
+
+Syntax:
+public record RecordName(Type field1, Type field2, ...) {
+    // optional: additional constructors, methods, static fields
+}
+
+Example from our project:
+```java
+public record StudentRecord(String name, List<Integer> grades) {
+    public double average() {
+        return grades.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+    }
+
+    public String grade() {
+        double avg = average();
+        if (avg >= 90) return "A";
+        else if (avg >= 80) return "B";
+        else if (avg >= 70) return "C";
+        else if (avg >= 60) return "D";
+        else return "F";
+    }
+}
+```
+
+Benefits:
+- Reduces boilerplate code significantly
+- Ensures immutability
+- Automatic generation of useful methods
+- Better performance (no need for reflection in some cases)
+- Improved readability
+
+Use Cases:
+- Data transfer objects (DTOs)
+- Value objects
+- Simple data containers
+- API response objects
+
+2. Sealed Classes (Java 17)
+===========================
+
+Sealed classes restrict which classes can extend or implement them. This provides better control over inheritance hierarchies and enables exhaustive pattern matching.
+
+Key Concepts:
+- A sealed class uses the 'sealed' keyword
+- Permitted subclasses are listed with 'permits'
+- Permitted classes must be in the same package (or module)
+- Permitted classes can be final, sealed, or non-sealed
+- Enables the compiler to perform exhaustive checks
+
+Syntax:
+public sealed class ParentClass permits Child1, Child2, Child3 {
+    // class body
+}
+
+Example from our project:
+```java
+public sealed class Processor permits CsvProcessor, HtmlProcessor {
+    // common methods if any
+}
+
+public final class CsvProcessor extends Processor {
+    // implementation
+}
+
+public final class HtmlProcessor extends Processor {
+    // implementation
+}
+```
+
+Benefits:
+- Controlled inheritance
+- Better encapsulation
+- Exhaustive pattern matching in switch expressions
+- Improved type safety
+- Documentation of design intent
+
+Use Cases:
+- Algebraic data types
+- State machines
+- Error handling hierarchies
+- API design with limited extensibility
+
+3. Text Blocks and Multiline Strings
+=====================================
+
+Text blocks provide a way to write multiline strings more conveniently, especially for HTML, SQL, JSON, etc.
+
+Key Features:
+- Use triple quotes """ to start and end
+- Automatic indentation handling
+- Preserves line breaks
+- Supports string interpolation with %s, %d, etc. or formatted()
+
+Syntax:
+String textBlock = """
+    Line 1
+    Line 2
+    Line 3
+    """;
+
+Example from our project:
+```java
+String html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Student Grade Report</title>
+        <style>
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid black; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+        </style>
+    </head>
+    <body>
+        <h1>Student Grade Report</h1>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Average</th>
+                <th>Grade</th>
+            </tr>
+            %s
+        </table>
+    </body>
+    </html>
+    """.formatted(rows.toString());
+```
+
+Benefits:
+- No need for concatenation or escape sequences
+- Better readability for multiline content
+- Automatic handling of indentation
+- Supports all string methods
+
+Use Cases:
+- HTML generation
+- SQL queries
+- JSON/XML creation
+- Documentation strings
+- Configuration files
+
+4. CompletableFuture Basics
+============================
+
+CompletableFuture represents a future result of an asynchronous computation. It provides a powerful way to handle asynchronous programming in Java.
+
+Key Methods:
+- supplyAsync(): Creates a CompletableFuture that runs a task asynchronously
+- thenApply(): Transforms the result of a CompletableFuture
+- thenAccept(): Consumes the result without returning a value
+- join(): Waits for completion and returns the result
+
+Example from our project:
+```java
+CompletableFuture.supplyAsync(() -> {
+    try {
+        return csvProcessor.readStudents("students.csv");
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+})
+.thenApply(students -> {
+    // Process with Streams: sort by average descending
+    return students.stream()
+            .sorted((s1, s2) -> Double.compare(s2.average(), s1.average()))
+            .toList();
+})
+.thenApply(sortedStudents -> htmlProcessor.generateHtml(sortedStudents))
+.thenAccept(html -> {
+    try {
+        htmlProcessor.writeHtml(html, "report.html");
+        System.out.println("Report generated: report.html");
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+})
+.join(); // Wait for completion
+```
+
+Benefits:
+- Non-blocking asynchronous operations
+- Composable asynchronous computations
+- Better resource utilization
+- Simplified error handling
+- Functional programming style
+
+Use Cases:
+- I/O operations (file reading/writing, network calls)
+- Database operations
+- Long-running computations
+- Parallel processing
+- Reactive programming
+
+5. Mini-Project: Student Grade Report Generator
+===============================================
+
+This project demonstrates the integration of all the above concepts in a real-world application.
+
+Project Structure:
+- StudentRecord.java: Record for student data
+- Processor.java: Sealed class for data processors
+- CsvProcessor.java: Handles CSV reading
+- HtmlProcessor.java: Handles HTML generation and writing
+- GradeReportGenerator.java: Main class using CompletableFuture
+- students.csv: Sample input data
+- report.html: Generated output
+
+Key Features:
+- Asynchronous CSV reading
+- Stream processing for data manipulation
+- HTML report generation with text blocks
+- Sorted output by average grade
+- Error handling in async operations
+
+Workflow:
+1. Read student data from CSV asynchronously
+2. Process data using Streams (sorting)
+3. Generate HTML report using text blocks
+4. Write report to disk asynchronously
+5. All operations chained with CompletableFuture
+
+This project showcases modern Java features working together to create efficient, readable, and maintainable code.
+
+Learning Outcomes:
+- Understanding of Java's evolution with new features
+- Practical application of records and sealed classes
+- Effective use of asynchronous programming
+- Stream API for data processing
+- Text blocks for string handling
+- Project structure and organization

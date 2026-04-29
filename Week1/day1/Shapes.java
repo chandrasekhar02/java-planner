@@ -1,20 +1,20 @@
 interface ShapeArea{
    
     public double area();
-    // double perimeter();
+    // solid prinmciples Single responsibiltity is used here
 }
 interface ShapePerimeter{
-    double perimeter();
+    double perimeter();// solid prinmciples Single responsibiltity is used here
 }
 class Circle implements ShapeArea, ShapePerimeter{
-    private double x;
+    private double x; // why use private? because it is open for extension but close for modifation by the soild primnciples 
     public Circle(double x){
         this.x = x;
     }
     @Override
     public double area(){
         return Math.PI*x*x;
-        // return Math.PI*a*x;
+        
     }
     @Override
     public double perimeter(){
